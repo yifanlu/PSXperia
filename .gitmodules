@@ -1,0 +1,3 @@
+[submodule "defaults/wrapper-library"]
+	path = defaults/wrapper-library
+	url = git@github.com:yifanlu/PSXPeria-Wrapper.git

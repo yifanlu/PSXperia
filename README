@@ -1,0 +1,9 @@
+PSXperia Emulator Converter Tool
+Alpha Release
+By Yifan Lu (http://yifan.lu/)
+========================================
+
+The data extraction class is not done yet, so you cannot use it without manually extracting the data 
+and replacing some strings. The GUI also isn't done and there is no command line option yet, so you 
+need to manually plug in the settings from the Java sources and compile. This is not for regular users 
+but for other developers who would like to see the tools.

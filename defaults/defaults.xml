@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>Default Strings</comment>
+<entry key="KEY_PARENTAL_RATING">All</entry>
+<entry key="KEY_PUBLISHER">Publisher</entry>
+<entry key="KEY_DESCRIPTION">Emulated PSX game.</entry>
+<entry key="KEY_DEVELOPER">Developer</entry>
+<entry key="KEY_DISPLAY_NAME">PSOne Game</entry>
+<entry key="KEY_TITLE_ID">NCXA00000_1</entry>
+<entry key="KEY_TITLE">PSOne Game</entry>
+<entry key="KEY_STORE_TYPE">AMP</entry>
+</properties>
