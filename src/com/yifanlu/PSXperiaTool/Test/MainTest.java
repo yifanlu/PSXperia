@@ -34,7 +34,7 @@ public class MainTest {
         Logger.setLevel(Logger.DEBUG);
         Properties defaults = new Properties();
         File currentDir = new File(new File(".").getAbsolutePath());
-        defaults.loadFromXML(new FileInputStream(new File(currentDir, "/defaults/defaults.xml")));
+        defaults.loadFromXML(new FileInputStream(new File(currentDir, "/resources/defaults.xml")));
 
         // SETTINGS
         defaults.put("ImageName", "/path/to/game.iso");

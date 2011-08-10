@@ -77,9 +77,18 @@ public class PSXperiaTool {
         return tempDir;
     }
 
-    private void checkData(File dataDir) throws IllegalArgumentException {
+    private void checkData(File dataDir) throws IllegalArgumentException, IOException {
         Logger.info("Checking to make sure all files are there.");
-        // TODO: Make sure all files exist
+        FileInputStream fstream = new FileInputStream(new File(mCurrentDir, "/resources/filelist.txt"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(fstream));
+        String line;
+        while((line = reader.readLine()) != null){
+            if(line.isEmpty())
+                continue;
+            File check = new File(mDataDir, line);
+            if(!check.exists())
+                throw new IllegalArgumentException("Cannot find required data file: " + line);
+        }
         Logger.debug("Done checking data.");
     }
 
@@ -213,14 +222,14 @@ public class PSXperiaTool {
         cmd[7] = ("-M");
         cmd[8] = ((new File(mTempDir, "/assets/AndroidManifest.xml")).getPath());
         cmd[9] = ("-I");
-        cmd[10] = ((new File(mCurrentDir, "/defaults/android-framework.jar")).getPath());
+        cmd[10] = ((new File(mCurrentDir, "/resources/android-framework.jar")).getPath());
         cmd[11] = (mTempDir.getPath());
         Logger.debug("Running command: " + Arrays.toString(cmd).replaceAll("\\,", ""));
         runCmdWithOutput(cmd);
         cmd = new String[11];
         cmd[0] = ("jarsigner");
         cmd[1] = ("-keystore");
-        cmd[2] = (mCurrentDir.getPath() + "/defaults/signApk");
+        cmd[2] = (mCurrentDir.getPath() + "/resources/signApk");
         cmd[3] = ("-storepass");
         cmd[4] = ("password");
         cmd[5] = ("-keypass");

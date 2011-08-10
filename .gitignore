@@ -1,4 +1,5 @@
 .DS_Store
+.idea/workspace.xml
 data/
 defaults/libjava-activity-wrapper.so
 lib/
