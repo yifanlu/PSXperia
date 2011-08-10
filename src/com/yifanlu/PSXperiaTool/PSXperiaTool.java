@@ -32,24 +32,24 @@ public class PSXperiaTool {
             "/ZPAK/metadata.xml"
     };
 
-    private File mCurrentDir;
+    private File mInputFile;
     private File mDataDir;
-    private File mTempDir;
+    private File mTempDir = null;
+    private File mOutputDir;
     private Properties mProperties;
 
-    public PSXperiaTool(File currentDir, Properties properties) {
-        mCurrentDir = currentDir;
-        mDataDir = new File(mCurrentDir, "/data");
-        mTempDir = new File(mCurrentDir, "/ps-image-temp");
+    public PSXperiaTool(Properties properties, File inputFile, File dataDir, File outputDir) {
+        mInputFile = inputFile;
+        mDataDir = dataDir;
         mProperties = properties;
-        Logger.info("PSXperiaTool initialized with current directory: %s, data directory: %s, and temporary directory: %s ", mCurrentDir.getPath(), mDataDir.getPath(), mTempDir.getPath());
+        mOutputDir = outputDir;
+        Logger.info("PSXperiaTool initialized, outputting to: %s", mOutputDir.getPath());
     }
 
-    public void startBuild() {
+    public void startBuild() throws IOException, InterruptedException {
         Logger.info("Starting build.");
-        try {
             checkData(mDataDir);
-            createTempDir(mDataDir, mTempDir);
+            mTempDir = createTempDir(mDataDir);
             copyIconImage((File) mProperties.get("IconFile"));
             //BuildResources br = new BuildResources(mProperties, mTempDir);
             replaceStrings();
@@ -59,27 +59,24 @@ public class PSXperiaTool {
             generateOutput();
             Logger.debug("Deleting temporary directory, %s", mTempDir.getPath());
             FileUtils.deleteDirectory(mTempDir);
-        } catch (IOException e) {
-            Logger.error("IO Error, Java says: %s", e.toString());
-        } catch (InterruptedException e) {
-            Logger.error("Process exec Error, Java says: %s", e.toString());
-        }
     }
 
-    private File createTempDir(File dataDir, File tempDir) throws IOException {
-        if (!dataDir.exists() || !dataDir.isDirectory())
-            throw new IOException("Cannot find data directory!");
+    private File createTempDir(File dataDir) throws IOException {
+        File tempDir = new File(new File("."), "/.psxperia." + (int) (Math.random() * 1000));
         if (tempDir.exists())
             FileUtils.deleteDirectory(tempDir);
-        if (!tempDir.mkdir())
+        if (!tempDir.mkdirs())
             throw new IOException("Cannot create temporary directory!");
         FileUtils.copyDirectory(dataDir, tempDir);
+        Logger.debug("Created temporary directory at, %s", tempDir.getPath());
         return tempDir;
     }
 
     private void checkData(File dataDir) throws IllegalArgumentException, IOException {
         Logger.info("Checking to make sure all files are there.");
-        FileInputStream fstream = new FileInputStream(new File(mCurrentDir, "/resources/filelist.txt"));
+        if(!mDataDir.exists())
+            throw new FileNotFoundException("Cannot find data directory!");
+        InputStream fstream = PSXperiaTool.class.getResourceAsStream("/resources/filelist.txt");
         BufferedReader reader = new BufferedReader(new InputStreamReader(fstream));
         String line;
         while((line = reader.readLine()) != null){
@@ -93,9 +90,9 @@ public class PSXperiaTool {
     }
 
     private void copyIconImage(File image) throws IllegalArgumentException, IOException {
-        Logger.info("Copying icon file over.");
         if (image == null || !(image instanceof File))
-            throw new IllegalArgumentException("Missing icon file.");
+            return;
+        Logger.info("Copying icon file over.");
         if (!image.exists())
             throw new IllegalArgumentException("Icon file not found.");
         FileUtils.copyFile(image, new File(mTempDir, "/res/drawable/icon.png"));
@@ -126,8 +123,7 @@ public class PSXperiaTool {
 
     private void generateImage() throws IOException {
         Logger.info("Generating PSImage.");
-        String fileName = mProperties.getProperty("ImageName");
-        FileInputStream in = new FileInputStream(fileName);
+        FileInputStream in = new FileInputStream(mInputFile);
         FileOutputStream out = new FileOutputStream(new File(mTempDir, "/ZPAK/data/image.ps"));
         FileOutputStream tocOut = new FileOutputStream(new File(mTempDir, "/image_ps_toc.bin"));
         PSImageCreate ps = new PSImageCreate(in);
@@ -152,7 +148,7 @@ public class PSXperiaTool {
         out.close();
         tocOut.close();
         in.close();
-        Logger.debug("Done generating PSImage at %s", fileName);
+        Logger.debug("Done generating PSImage");
 
         Logger.info("Generating ZPAK.");
         File zpakDirectory = new File(mTempDir, "/ZPAK");
@@ -193,12 +189,11 @@ public class PSXperiaTool {
     */
 
     private void generateOutput() throws IOException, InterruptedException {
-        File outDir = new File(mProperties.getProperty("OutputDirectory"));
-        Logger.info("Done processing, generating output to %s.", outDir.getPath());
+        Logger.info("Done processing, generating output to %s.", mOutputDir.getPath());
         String titleId = mProperties.getProperty("KEY_TITLE_ID");
-        if (!outDir.exists())
-            outDir.mkdir();
-        File outDataDir = new File(outDir, "/data/com.sony.playstation." + titleId + "/files/content");
+        if (!mOutputDir.exists())
+            mOutputDir.mkdir();
+        File outDataDir = new File(mOutputDir, "/data/com.sony.playstation." + titleId + "/files/content");
         if (!outDataDir.exists())
             outDataDir.mkdirs();
         Logger.debug("Moving files around.");
@@ -206,10 +201,18 @@ public class PSXperiaTool {
         FileUtils.moveFileToDirectory(new File(mTempDir, "/" + titleId + ".zpak"), outDataDir, false);
         FileUtils.moveFileToDirectory(new File(mTempDir, "/image_ps_toc.bin"), outDataDir, false);
         //AndrolibResources ares = new AndrolibResources();
-        File outApk = new File(outDir, "/com.sony.playstation." + titleId + ".apk");
+        File outApk = new File(mOutputDir, "/com.sony.playstation." + titleId + ".apk");
         //ares.aaptPackage(outApk, new File(mTempDir, "/AndroidManifest.xml"), new File(mTempDir, "/res"), mTempDir, null, null, false, false);
 
         // TEMPORARY! Will use cleaner method one day
+
+        File currentDir = new File(".");
+        File androidFrameworkJar = new File(currentDir, "android-framework.jar");
+        File keystoreFile = new File(currentDir, "signApk");
+        InputStream in1 = PSXperiaTool.class.getResourceAsStream("/resources/android-framework.jar");
+        InputStream in2 = PSXperiaTool.class.getResourceAsStream("/resources/signApk");
+        writeStreamToFile(in1, androidFrameworkJar);
+        writeStreamToFile(in2, keystoreFile);
 
         String[] cmd = new String[12];
         cmd[0] = ("aapt");
@@ -222,14 +225,14 @@ public class PSXperiaTool {
         cmd[7] = ("-M");
         cmd[8] = ((new File(mTempDir, "/assets/AndroidManifest.xml")).getPath());
         cmd[9] = ("-I");
-        cmd[10] = ((new File(mCurrentDir, "/resources/android-framework.jar")).getPath());
+        cmd[10] = (androidFrameworkJar.getPath());
         cmd[11] = (mTempDir.getPath());
         Logger.debug("Running command: " + Arrays.toString(cmd).replaceAll("\\,", ""));
         runCmdWithOutput(cmd);
         cmd = new String[11];
         cmd[0] = ("jarsigner");
         cmd[1] = ("-keystore");
-        cmd[2] = (mCurrentDir.getPath() + "/resources/signApk");
+        cmd[2] = (keystoreFile.getPath());
         cmd[3] = ("-storepass");
         cmd[4] = ("password");
         cmd[5] = ("-keypass");
@@ -243,6 +246,8 @@ public class PSXperiaTool {
 
         String apkName = outApk.getPath();
         outApk.delete();
+        androidFrameworkJar.delete();
+        keystoreFile.delete();
         FileUtils.moveFile(new File(apkName + ".signed"), new File(apkName));
 
         Logger.info("Done.");
@@ -262,5 +267,16 @@ public class PSXperiaTool {
         if (ps.waitFor() != 0) {
             throw new IOException("Executable did not return without error.");
         }
+    }
+
+    private void writeStreamToFile(InputStream in, File outFile) throws IOException {
+        Logger.verbose("Writing to: %s", outFile.getPath());
+        FileOutputStream out = new FileOutputStream(outFile);
+        byte[] buffer = new byte[1024];
+        int n;
+        while((n = in.read(buffer)) != -1){
+            out.write(buffer, 0, n);
+        }
+        out.close();
     }
 }

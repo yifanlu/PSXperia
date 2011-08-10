@@ -1,9 +1,50 @@
 PSXperia Emulator Converter Tool
-Alpha Release
+Beta Release
 By Yifan Lu (http://yifan.lu/)
 ========================================
 
-The data extraction class is not done yet, so you cannot use it without manually extracting the data 
-and replacing some strings. The GUI also isn't done and there is no command line option yet, so you 
-need to manually plug in the settings from the Java sources and compile. This is not for regular users 
-but for other developers who would like to see the tools.
+This tool will take a PSX image that you legally own and convert it to be playable on the Xperia Play with the emulator extracted from the packaged game "Crash Bandicoot."
+
+Requirements
+
+* Android SDK with "aapk" in your system's PATH variable
+* Java SDK with "jarsigner" in your system's PATH variable
+* Apache Commons IO 2.0.1
+* Apktool (http://code.google.com/p/android-apktool/)
+
+To build, just attach these libraries and compile.
+
+To run, use "java -jar PSXperiaTool.jar" to see usage directions, which is also listed below for your convenience.
+
+Usage:
+  Extract and patch data files
+  psxperia e[x]tract [-v|--verbose] input.apk input-data.zpak output
+    [-v|--verbose]    Verbose output
+    input.apk         Either com.sony.playstation.ncua94900_1.apk or com.sony.playstation.ncea00344_1.apk
+    input-data.zpak   Either NCUA94900_1_1.zpak or NCEA00344_1_1.zpak (must match region of APK)
+    output            Directory to extract the files
+
+  Convert ISO to Xperia Play APK and ZPAK
+  psxperia [c]onvert [OPTIONS] titleId image.iso output
+    titleId           An unique ID, usually from the game in the format NCXAXXXXX_1
+    image.iso         Input PSX image. You must rip it on your own!
+    output            Directory to output files
+    Options (unset options will be set to defaults):
+      -v|--verbose    Verbose output, including image creation progress
+      -D directory    Custom location for extracted data files, default is "./data"
+      --load-xml      Load options from Java properties XML
+      --game-name     Name of the game
+      --description   Description of the game
+      --publisher     Publisher of the game
+      --developer     Developer of the game
+      --icon-file     Path to image for icon
+      --store-type    Where to find this title (any string will do)
+      --analog-mode   true|false, Turn on/off analog controls (game must support it).
+
+  Convert image.ps to ISO
+  psxperia [d]ecompress [-v|--verbose] input.ps output.iso
+    [-v|--verbose]    Verbose output
+    input.ps          image.ps from ZPAK
+    output.iso        ISO file to generate
+
+

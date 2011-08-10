@@ -95,5 +95,4 @@
 /res/values-zh-rCN/strings.xml
 /res/values-zh-rTW/strings.xml
 /ZPAK/data/ps1_rom.bin
-/ZPAK/manual/000
 /ZPAK/metadata.xml

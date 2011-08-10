@@ -45,7 +45,7 @@ public class ZpakCreate {
     }
 
     public void create(boolean noCompress) throws IOException {
-        Logger.info("Generating zpak file from directory %s with compression = %b", mDirectory.getPath(), noCompress);
+        Logger.info("Generating zpak file from directory %s with compression = %b", mDirectory.getPath(), !noCompress);
         IOFileFilter filter = new IOFileFilter() {
             public boolean accept(File file) {
                 if (file.getName().startsWith(".")) {

@@ -10,4 +10,6 @@
 <entry key="KEY_TITLE_ID">NCXA00000_1</entry>
 <entry key="KEY_TITLE">PSOne Game</entry>
 <entry key="KEY_STORE_TYPE">AMP</entry>
+<entry key="KEY_ANALOG_MODE">NO</entry>
+<entry key="KEY_CONTAINS_MANUAL">false</entry>
 </properties>
