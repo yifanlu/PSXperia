@@ -57,7 +57,8 @@ public class PSXperiaTool {
             generateDefaultZpak();
             //buildResources(br);
             generateOutput();
-            // TODO: Delete temp dir
+            Logger.debug("Deleting temporary directory, %s", mTempDir.getPath());
+            FileUtils.deleteDirectory(mTempDir);
         } catch (IOException e) {
             Logger.error("IO Error, Java says: %s", e.toString());
         } catch (InterruptedException e) {
@@ -109,7 +110,7 @@ public class PSXperiaTool {
             replacement.put("\\{" + find + "\\}", (String) value);
             replacement.put("\\{FILTERED_" + find + "\\}", StringReplacement.filter((String) value));
         }
-        StringReplacement strReplace = new StringReplacement(replacement, mDataDir);
+        StringReplacement strReplace = new StringReplacement(replacement, mTempDir);
         strReplace.execute(FILES_TO_MODIFY);
         Logger.debug("Done replacing strings.");
     }
