@@ -62,10 +62,13 @@ public class CommandLine {
             printHelp();
         } catch (IOException ex) {
             Logger.error("IO error, Java says: %s", ex.getMessage());
+            ex.printStackTrace();
         } catch (InterruptedException ex) {
             Logger.error("Process exec Error, Java says: %s", ex.toString());
+            ex.printStackTrace();
         } catch (DataFormatException ex) {
             Logger.error("Data format error, Java says: %s", ex.toString());
+            ex.printStackTrace();
         }
     }
 
