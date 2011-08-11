@@ -30,6 +30,7 @@ public class ApkBuilder {
     private static final String ALIAS = "signPSXperia";
     private static final char[] KEYSTORE_PASSWORD = {'p', 'a', 's', 's', 'w', 'o', 'r', 'd'};
     private static final char[] ALIAS_PASSWORD = {'p', 'a', 's', 's', 'w', 'o', 'r', 'd'};
+    public static final String VERSION = "0.3 Beta 2";
 
     private File mInputDir;
     private File mOutputApk;

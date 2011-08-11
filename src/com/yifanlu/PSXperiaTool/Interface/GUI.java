@@ -703,10 +703,10 @@ public class GUI extends javax.swing.JFrame {
                     Logger.error("Cannot build APK!");
                     ex.printStackTrace();
                 } catch (GeneralSecurityException ex) {
-                    Logger.error("Error signing JAR, Java says: %s", ex.toString());
+                    Logger.error("Error signing JAR, Java says: %s", ex.getMessage());
                     ex.printStackTrace();
                 } catch (SignedJarBuilder.IZipEntryFilter.ZipAbortException ex) {
-                    Logger.error("Error signing JAR, Java says: %s", ex.toString());
+                    Logger.error("Error signing JAR, Java says: %s", ex.getMessage());
                     ex.printStackTrace();
                 } finally {
                     convertProgress.setValue(0);
@@ -754,6 +754,9 @@ public class GUI extends javax.swing.JFrame {
                     mThis.setEnabled(true);
                 } catch (IOException ex) {
                     Logger.error("Cannot extract APK!");
+                    ex.printStackTrace();
+                } catch (UnsupportedOperationException ex) {
+                    Logger.error("Unsupported exception: %s", ex.getMessage());
                     ex.printStackTrace();
                 } finally {
                     extractProgress.setValue(0);

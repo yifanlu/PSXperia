@@ -26,6 +26,7 @@ import java.security.GeneralSecurityException;
 import java.util.*;
 
 public class PSXperiaTool extends ProgressMonitor {
+    public static final String VERSION = "0.3 Beta 3";
     public static final String[] FILES_TO_MODIFY = {
             //"/AndroidManifest.xml",
             "/assets/AndroidManifest.xml",
@@ -51,7 +52,7 @@ public class PSXperiaTool extends ProgressMonitor {
     }
 
     public void startBuild() throws IOException, InterruptedException, GeneralSecurityException, SignedJarBuilder.IZipEntryFilter.ZipAbortException {
-        Logger.info("Starting build.");
+        Logger.info("Starting build with PSXPeria Converter version %s", VERSION);
         checkData(mDataDir);
         mTempDir = createTempDir(mDataDir);
         copyIconImage((File) mProperties.get("IconFile"));

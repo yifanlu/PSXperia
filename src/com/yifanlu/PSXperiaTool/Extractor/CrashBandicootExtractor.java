@@ -39,6 +39,9 @@ public class CrashBandicootExtractor extends ProgressMonitor {
     public static long[] KNOWN_VALID_APK_CRC32 = {
             0xE7BCB6D5l, 0xBB542581l
     };
+    public static long[] KNOWN_INVALID_APK_CRC32 = {
+            0x3B6A23C1
+    };
     private static final int TOTAL_STEPS = 8;
     private File mApkFile;
     private File mZpakData;
@@ -54,6 +57,7 @@ public class CrashBandicootExtractor extends ProgressMonitor {
     }
 
     public void extractApk() throws IOException {
+        Logger.info("Starting extraction with PSXPeria Extractor version %s", PSXperiaTool.VERSION);
         verifyFiles();
         decodeValues();
         FileFilter filterCompiledRes = new FileFilter() {
@@ -84,6 +88,11 @@ public class CrashBandicootExtractor extends ProgressMonitor {
         for (long check : KNOWN_VALID_APK_CRC32){
             if (check == crc32)
                 valid = true;
+        }
+        for (long check : KNOWN_INVALID_APK_CRC32){
+            if (check == crc32){
+                throw new UnsupportedOperationException("This version of Crash Bandicoot is known to not work, please use a different version. CRC32: " + crc32);
+            }
         }
         if (!valid) {
             Logger.warning("This APK is not a known valid one. The extractor will continue, but you may get errors later on. CRC32: %d", crc32);
