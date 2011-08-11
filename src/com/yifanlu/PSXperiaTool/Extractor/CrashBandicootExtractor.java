@@ -37,7 +37,7 @@ import java.util.zip.ZipInputStream;
 
 public class CrashBandicootExtractor extends ProgressMonitor {
     public static long[] KNOWN_VALID_APK_CRC32 = {
-            0xE7BCB6D5, 0xBB542581
+            0xE7BCB6D5l, 0xBB542581l
     };
     private static final int TOTAL_STEPS = 8;
     private File mApkFile;
@@ -81,11 +81,12 @@ public class CrashBandicootExtractor extends ProgressMonitor {
             throw new FileNotFoundException("Cannot find ZPAK file: " + mZpakData.getPath());
         long crc32 = ZpakCreate.getCRC32(mApkFile);
         boolean valid = false;
-        for (long check : KNOWN_VALID_APK_CRC32)
+        for (long check : KNOWN_VALID_APK_CRC32){
             if (check == crc32)
                 valid = true;
+        }
         if (!valid) {
-            Logger.warning("This APK is not a known valid one. The extractor will continue, but you may get errors later on.");
+            Logger.warning("This APK is not a known valid one. The extractor will continue, but you may get errors later on. CRC32: %d", crc32);
         }
         if (!mOutputDir.exists())
             mOutputDir.mkdirs();
