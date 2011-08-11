@@ -18,9 +18,11 @@
 
 package com.yifanlu.PSXperiaTool;
 
+import com.android.sdklib.internal.build.SignedJarBuilder;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.security.GeneralSecurityException;
 import java.util.*;
 
 public class PSXperiaTool extends ProgressMonitor {
@@ -48,7 +50,7 @@ public class PSXperiaTool extends ProgressMonitor {
         setTotalSteps(TOTAL_STEPS);
     }
 
-    public void startBuild() throws IOException, InterruptedException {
+    public void startBuild() throws IOException, InterruptedException, GeneralSecurityException, SignedJarBuilder.IZipEntryFilter.ZipAbortException {
         Logger.info("Starting build.");
         checkData(mDataDir);
         mTempDir = createTempDir(mDataDir);
@@ -186,23 +188,7 @@ public class PSXperiaTool extends ProgressMonitor {
         Logger.debug("Done generating default ZPAK at %s", zpakFile.getPath());
     }
 
-    // Unused, resources will be compiled at the end
-    /*
-    private void buildResources(BuildResources br) throws IOException, AndrolibException {
-        br.compileResources();
-        // Delete old files
-        FileUtils.deleteDirectory(new File(mTempDir, "/res"));
-        FileUtils.deleteQuietly(new File(mTempDir, "/AndroidManifest.xml"));
-        // Add new files
-        FileUtils.moveDirectoryToDirectory(new File(mTempDir, "/build/apk/res"), mTempDir, false);
-        FileUtils.moveFileToDirectory(new File(mTempDir, "/build/apk/AndroidManifest.xml"), mTempDir, false);
-        FileUtils.moveFileToDirectory(new File(mTempDir, "/build/apk/resources.arsc"), mTempDir, false);
-        // Delete temp dir
-        FileUtils.deleteDirectory(new File(mTempDir, "/build"));
-    }
-    */
-
-    private void generateOutput() throws IOException, InterruptedException {
+    private void generateOutput() throws IOException, InterruptedException, GeneralSecurityException, SignedJarBuilder.IZipEntryFilter.ZipAbortException {
         nextStep("Done processing, generating output.");
         String titleId = mProperties.getProperty("KEY_TITLE_ID");
         if (!mOutputDir.exists())
@@ -214,55 +200,10 @@ public class PSXperiaTool extends ProgressMonitor {
         FileUtils.cleanDirectory(outDataDir);
         FileUtils.moveFileToDirectory(new File(mTempDir, "/" + titleId + ".zpak"), outDataDir, false);
         FileUtils.moveFileToDirectory(new File(mTempDir, "/image_ps_toc.bin"), outDataDir, false);
-        //AndrolibResources ares = new AndrolibResources();
         File outApk = new File(mOutputDir, "/com.sony.playstation." + titleId + ".apk");
-        //ares.aaptPackage(outApk, new File(mTempDir, "/AndroidManifest.xml"), new File(mTempDir, "/res"), mTempDir, null, null, false, false);
 
-        // TEMPORARY! Will use cleaner method one day
-
-        File currentDir = new File(".");
-        File androidFrameworkJar = new File(currentDir, "android-framework.jar");
-        File keystoreFile = new File(currentDir, "signApk");
-        InputStream in1 = PSXperiaTool.class.getResourceAsStream("/resources/android-framework.jar");
-        InputStream in2 = PSXperiaTool.class.getResourceAsStream("/resources/signApk");
-        writeStreamToFile(in1, androidFrameworkJar);
-        writeStreamToFile(in2, keystoreFile);
-
-        String[] cmd = new String[12];
-        cmd[0] = ("aapt");
-        cmd[1] = ("package");
-        cmd[2] = ("-f");
-        cmd[3] = ("-F");
-        cmd[4] = (outApk.getPath());
-        cmd[5] = ("-S");
-        cmd[6] = ((new File(mTempDir, "/res")).getPath());
-        cmd[7] = ("-M");
-        cmd[8] = ((new File(mTempDir, "/assets/AndroidManifest.xml")).getPath());
-        cmd[9] = ("-I");
-        cmd[10] = (androidFrameworkJar.getPath());
-        cmd[11] = (mTempDir.getPath());
-        Logger.debug("Running command: " + Arrays.toString(cmd).replaceAll("\\,", ""));
-        runCmdWithOutput(cmd);
-        cmd = new String[11];
-        cmd[0] = ("jarsigner");
-        cmd[1] = ("-keystore");
-        cmd[2] = (keystoreFile.getPath());
-        cmd[3] = ("-storepass");
-        cmd[4] = ("password");
-        cmd[5] = ("-keypass");
-        cmd[6] = ("password");
-        cmd[7] = ("-signedjar");
-        cmd[8] = (outApk.getPath() + ".signed");
-        cmd[9] = (outApk.getPath());
-        cmd[10] = ("signPSXperia");
-        Logger.debug("Running command: " + Arrays.toString(cmd).replaceAll("\\,", ""));
-        runCmdWithOutput(cmd);
-
-        String apkName = outApk.getPath();
-        outApk.delete();
-        androidFrameworkJar.delete();
-        keystoreFile.delete();
-        FileUtils.moveFile(new File(apkName + ".signed"), new File(apkName));
+        ApkBuilder build = new ApkBuilder(mTempDir, outApk);
+        build.buildApk();
 
         Logger.info("Done.");
         Logger.info("APK file: %s", outApk.getPath());
@@ -270,27 +211,5 @@ public class PSXperiaTool extends ProgressMonitor {
 
     }
 
-    public static void runCmdWithOutput(String[] cmd) throws IOException, InterruptedException {
-        Process ps = Runtime.getRuntime().exec(cmd);
-        BufferedReader in = new BufferedReader(new InputStreamReader(ps.getErrorStream()));
-        String line;
-        while ((line = in.readLine()) != null) {
-            Logger.debug(line);
-        }
-        in.close();
-        if (ps.waitFor() != 0) {
-            throw new IOException("Executable did not return without error.");
-        }
-    }
 
-    private void writeStreamToFile(InputStream in, File outFile) throws IOException {
-        Logger.verbose("Writing to: %s", outFile.getPath());
-        FileOutputStream out = new FileOutputStream(outFile);
-        byte[] buffer = new byte[1024];
-        int n;
-        while((n = in.read(buffer)) != -1){
-            out.write(buffer, 0, n);
-        }
-        out.close();
-    }
 }

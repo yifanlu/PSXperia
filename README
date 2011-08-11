@@ -1,19 +1,23 @@
 PSXperia Emulator Converter Tool
-Beta Release
+Beta 2 Release
 By Yifan Lu (http://yifan.lu/)
 ========================================
 
 This tool will take a PSX image that you legally own and convert it to be playable on the Xperia Play with the emulator extracted from the packaged game "Crash Bandicoot."
 
-Requirements
+To build, you need to copy the following to the "lib" directory
+* apktool.jar from http://code.google.com/p/android-apktool/
+* commons-io-2.0.1.jar from http://commons.apache.org/io/download_io.cgi
+* sdklib.jar from Android SDK (under tools/lib)
+* swing-layout-1.0.4.jar from Netbeans (under platform/modules/ext)
 
-* Android SDK with "aapk" in your system's PATH variable
-* Java SDK with "jarsigner" in your system's PATH variable
-* Apache Commons IO (2.0.1)
-* Swing Layout Extensions (1.0.4)
-* Apktool (http://code.google.com/p/android-apktool/)
+You also need a copy of "aapt" from Android SDK (under platform-tools)
+* OSX version named aapt-osx
+* Windows version named aapt-windows.exe
+* Linux version named aapt-linux
+Put these in the "resources" directory
 
-To build, just attach these libraries and compile.
+Finally, you need my PSXperia wrapper library (compiled) in the "resources" directory
 
 To run the GUI, use "java -jar PSXperiaTool.jar"
 To run the command line tool, use "java -cp PSXperiaTool.jar com.yifanlu.PSXperiaTool.Interface.CommandLine" to see usage directions, which is also listed below for your convenience.

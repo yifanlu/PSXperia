@@ -18,6 +18,7 @@
 
 package com.yifanlu.PSXperiaTool.Interface;
 
+import com.android.sdklib.internal.build.SignedJarBuilder;
 import com.yifanlu.PSXperiaTool.Extractor.CrashBandicootExtractor;
 import com.yifanlu.PSXperiaTool.Logger;
 import com.yifanlu.PSXperiaTool.PSXperiaTool;
@@ -29,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Properties;
 
 public class GUI extends javax.swing.JFrame {
@@ -699,6 +701,12 @@ public class GUI extends javax.swing.JFrame {
                     ex.printStackTrace();
                 } catch (IOException ex) {
                     Logger.error("Cannot build APK!");
+                    ex.printStackTrace();
+                } catch (GeneralSecurityException ex) {
+                    Logger.error("Error signing JAR, Java says: %s", ex.toString());
+                    ex.printStackTrace();
+                } catch (SignedJarBuilder.IZipEntryFilter.ZipAbortException ex) {
+                    Logger.error("Error signing JAR, Java says: %s", ex.toString());
                     ex.printStackTrace();
                 } finally {
                     convertProgress.setValue(0);

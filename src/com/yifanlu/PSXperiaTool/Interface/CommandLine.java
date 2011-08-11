@@ -18,6 +18,7 @@
 
 package com.yifanlu.PSXperiaTool.Interface;
 
+import com.android.sdklib.internal.build.SignedJarBuilder;
 import com.yifanlu.PSXperiaTool.Extractor.CrashBandicootExtractor;
 import com.yifanlu.PSXperiaTool.Logger;
 import com.yifanlu.PSXperiaTool.PSImageExtract;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.Stack;
@@ -69,6 +71,12 @@ public class CommandLine {
         } catch (DataFormatException ex) {
             Logger.error("Data format error, Java says: %s", ex.toString());
             ex.printStackTrace();
+        } catch (GeneralSecurityException ex) {
+            Logger.error("Error signing JAR, Java says: %s", ex.toString());
+            ex.printStackTrace();
+        } catch (SignedJarBuilder.IZipEntryFilter.ZipAbortException ex) {
+            Logger.error("Error signing JAR, Java says: %s", ex.toString());
+            ex.printStackTrace();
         }
     }
 
@@ -96,7 +104,7 @@ public class CommandLine {
         System.exit(0);
     }
 
-    public static void doConvertImage(String[] args) throws InvalidArgumentException, IOException, InterruptedException {
+    public static void doConvertImage(String[] args) throws InvalidArgumentException, IOException, InterruptedException, GeneralSecurityException, SignedJarBuilder.IZipEntryFilter.ZipAbortException {
         if (args.length < 3)
             throw new InvalidArgumentException("Not enough input.");
 

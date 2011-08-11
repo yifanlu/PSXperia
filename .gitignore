@@ -3,6 +3,7 @@
 .idea/uiDesigner.xml
 data/
 resources/libjava-activity-wrapper.so
+resources/aapt*
 lib/
 out/
 output/
