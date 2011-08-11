@@ -18,6 +18,8 @@
 
 package com.yifanlu.PSXperiaTool;
 
+import javax.swing.*;
+
 public class Logger {
     public static final int ALL = 0x4;
     public static final int DEBUG = 0x3;
@@ -26,6 +28,7 @@ public class Logger {
     public static final int ERROR = 0x0;
     private static Logger ourInstance = new Logger();
     private static int mLevel;
+    private static JFrame mFrame;
 
     public Logger() {
         this.mLevel = ERROR;
@@ -41,6 +44,10 @@ public class Logger {
 
     public static int getLevel() {
         return mLevel;
+    }
+
+    public static void setGUIFrame(JFrame frame){
+        mFrame = frame;
     }
 
     public static void verbose(String input) {
@@ -79,13 +86,19 @@ public class Logger {
     }
 
     public static void warning(String format, Object... input) {
-        if (mLevel >= WARNING)
+        if (mLevel >= WARNING){
             System.out.printf("%s" + format + "\n", addObjectToArray("[W] ", input));
+            if(mFrame != null)
+                JOptionPane.showMessageDialog(mFrame, String.format(format, input), "Warning", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     public static void error(String format, Object... input) {
-        if (mLevel >= ERROR)
+        if (mLevel >= ERROR){
             System.out.printf("%s" + format + "\n", addObjectToArray("[E] ", input));
+            if(mFrame != null)
+                JOptionPane.showMessageDialog(mFrame, String.format(format, input), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private static Object[] addObjectToArray(Object obj, Object[] arr) {

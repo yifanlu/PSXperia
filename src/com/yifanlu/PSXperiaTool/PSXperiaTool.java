@@ -23,7 +23,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.*;
 import java.util.*;
 
-public class PSXperiaTool {
+public class PSXperiaTool extends ProgressMonitor {
     public static final String[] FILES_TO_MODIFY = {
             //"/AndroidManifest.xml",
             "/assets/AndroidManifest.xml",
@@ -37,6 +37,7 @@ public class PSXperiaTool {
     private File mTempDir = null;
     private File mOutputDir;
     private Properties mProperties;
+    private static final int TOTAL_STEPS = 8;
 
     public PSXperiaTool(Properties properties, File inputFile, File dataDir, File outputDir) {
         mInputFile = inputFile;
@@ -44,24 +45,27 @@ public class PSXperiaTool {
         mProperties = properties;
         mOutputDir = outputDir;
         Logger.info("PSXperiaTool initialized, outputting to: %s", mOutputDir.getPath());
+        setTotalSteps(TOTAL_STEPS);
     }
 
     public void startBuild() throws IOException, InterruptedException {
         Logger.info("Starting build.");
-            checkData(mDataDir);
-            mTempDir = createTempDir(mDataDir);
-            copyIconImage((File) mProperties.get("IconFile"));
-            //BuildResources br = new BuildResources(mProperties, mTempDir);
-            replaceStrings();
-            generateImage();
-            generateDefaultZpak();
-            //buildResources(br);
-            generateOutput();
-            Logger.debug("Deleting temporary directory, %s", mTempDir.getPath());
-            FileUtils.deleteDirectory(mTempDir);
+        checkData(mDataDir);
+        mTempDir = createTempDir(mDataDir);
+        copyIconImage((File) mProperties.get("IconFile"));
+        //BuildResources br = new BuildResources(mProperties, mTempDir);
+        replaceStrings();
+        generateImage();
+        generateDefaultZpak();
+        //buildResources(br);
+        generateOutput();
+        nextStep("Deleting temporary directory");
+        FileUtils.deleteDirectory(mTempDir);
+        nextStep("Done.");
     }
 
     private File createTempDir(File dataDir) throws IOException {
+        nextStep("Creating temporary directory.");
         File tempDir = new File(new File("."), "/.psxperia." + (int) (Math.random() * 1000));
         if (tempDir.exists())
             FileUtils.deleteDirectory(tempDir);
@@ -73,7 +77,7 @@ public class PSXperiaTool {
     }
 
     private void checkData(File dataDir) throws IllegalArgumentException, IOException {
-        Logger.info("Checking to make sure all files are there.");
+        nextStep("Checking to make sure all files are there.");
         if(!mDataDir.exists())
             throw new FileNotFoundException("Cannot find data directory!");
         InputStream fstream = PSXperiaTool.class.getResourceAsStream("/resources/filelist.txt");
@@ -90,9 +94,11 @@ public class PSXperiaTool {
     }
 
     private void copyIconImage(File image) throws IllegalArgumentException, IOException {
-        if (image == null || !(image instanceof File))
+        nextStep("Copying icon if needed.");
+        if (image == null || !(image instanceof File)){
+            Logger.verbose("Icon copying not needed.");
             return;
-        Logger.info("Copying icon file over.");
+        }
         if (!image.exists())
             throw new IllegalArgumentException("Icon file not found.");
         FileUtils.copyFile(image, new File(mTempDir, "/res/drawable/icon.png"));
@@ -101,7 +107,7 @@ public class PSXperiaTool {
     }
 
     public void replaceStrings() throws IOException {
-        Logger.info("Replacing strings.");
+        nextStep("Replacing strings.");
         Map<String, String> replacement = new TreeMap<String, String>();
         Iterator<Object> it = mProperties.keySet().iterator();
         while (it.hasNext()) {
@@ -122,15 +128,13 @@ public class PSXperiaTool {
     }
 
     private void generateImage() throws IOException {
-        Logger.info("Generating PSImage.");
+        nextStep("Generating PSImage.");
         FileInputStream in = new FileInputStream(mInputFile);
         FileOutputStream out = new FileOutputStream(new File(mTempDir, "/ZPAK/data/image.ps"));
         FileOutputStream tocOut = new FileOutputStream(new File(mTempDir, "/image_ps_toc.bin"));
         PSImageCreate ps = new PSImageCreate(in);
         PSImage.ProgressCallback progress = new PSImage.ProgressCallback() {
-            int mBytesRead = 0
-                    ,
-                    mBytesWritten = 0;
+            int mBytesRead = 0, mBytesWritten = 0;
 
             public void bytesReadChanged(int delta) {
                 mBytesRead += delta;
@@ -161,7 +165,7 @@ public class PSXperiaTool {
     }
 
     private void generateDefaultZpak() throws IOException {
-        Logger.info("Generating default ZPAK.");
+        nextStep("Generating default ZPAK.");
         File defaultZpakDirectory = new File(mTempDir, "/assets/ZPAK");
         File zpakFile = new File(mTempDir, "/assets/" + mProperties.getProperty("KEY_TITLE_ID") + ".zpak");
         FileOutputStream zpakOut = new FileOutputStream(zpakFile);
@@ -189,7 +193,7 @@ public class PSXperiaTool {
     */
 
     private void generateOutput() throws IOException, InterruptedException {
-        Logger.info("Done processing, generating output to %s.", mOutputDir.getPath());
+        nextStep("Done processing, generating output.");
         String titleId = mProperties.getProperty("KEY_TITLE_ID");
         if (!mOutputDir.exists())
             mOutputDir.mkdir();

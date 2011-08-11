@@ -61,8 +61,8 @@ public class StringReplacement {
             writer.write(line);
             writer.newLine();
         }
-        writer.close();
         reader.close();
+        writer.close();
         file.delete();
         FileUtils.moveFile(new File(name + ".tmp"), file);
         Logger.debug("Successfully cleaned up and done with string replacement.");

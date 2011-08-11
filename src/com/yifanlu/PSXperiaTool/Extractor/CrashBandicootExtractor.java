@@ -22,11 +22,9 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtFile;
+import com.sun.javaws.progress.Progress;
 import com.sun.org.apache.xpath.internal.operations.Or;
-import com.yifanlu.PSXperiaTool.Logger;
-import com.yifanlu.PSXperiaTool.PSXperiaTool;
-import com.yifanlu.PSXperiaTool.StringReplacement;
-import com.yifanlu.PSXperiaTool.ZpakCreate;
+import com.yifanlu.PSXperiaTool.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
@@ -37,10 +35,11 @@ import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class CrashBandicootExtractor {
+public class CrashBandicootExtractor extends ProgressMonitor {
     public static long[] KNOWN_VALID_APK_CRC32 = {
             0xE7BCB6D5, 0xBB542581
     };
+    private static final int TOTAL_STEPS = 8;
     private File mApkFile;
     private File mZpakData;
     private File mOutputDir;
@@ -51,6 +50,7 @@ public class CrashBandicootExtractor {
         this.mApkFile = apk;
         this.mOutputDir = outputDir;
         this.mZpakData = zPakData;
+        setTotalSteps(TOTAL_STEPS);
     }
 
     public void extractApk() throws IOException {
@@ -64,14 +64,17 @@ public class CrashBandicootExtractor {
                 return (!parent.getName().equals("res")) && (!parent.getParentFile().getName().equals("res"));
             }
         };
+        nextStep("Extracting APK");
         extractZip(mApkFile, mOutputDir, filterCompiledRes);
         extractZpaks();
         cleanUp();
         moveResourceFiles();
         patchStrings();
+        nextStep("Done.");
     }
 
     private void verifyFiles() throws IOException {
+        nextStep("Verifying files");
         if (!mApkFile.exists())
             throw new FileNotFoundException("Cannot find APK file: " + mApkFile.getPath());
         if (!mZpakData.exists())
@@ -118,6 +121,7 @@ public class CrashBandicootExtractor {
     }
 
     private void extractZpaks() throws IOException {
+        nextStep("Extracting ZPAKS");
         WildcardFileFilter ff = new WildcardFileFilter("*.zpak");
         File[] candidates = (new File(mOutputDir, "/assets")).listFiles((FileFilter)ff);
         if(candidates == null || candidates.length < 1)
@@ -142,6 +146,7 @@ public class CrashBandicootExtractor {
     }
 
     private void decodeValues() throws IOException {
+        nextStep("Decoding values");
         try {
             AndrolibResources res = new AndrolibResources();
             ExtFile extFile = new ExtFile(mApkFile);
@@ -154,14 +159,14 @@ public class CrashBandicootExtractor {
     }
 
     private void cleanUp() throws IOException {
-        Logger.info("Removing unneeded files.");
+        nextStep("Removing unneeded files.");
         (new File(mOutputDir, "/AndroidManifest.xml")).delete();
         FileUtils.deleteDirectory(new File(mOutputDir, "/META-INF"));
         Logger.verbose("Done cleaning up.");
     }
 
     private void moveResourceFiles() throws IOException {
-        Logger.info("Adding new files.");
+        nextStep("Adding new files.");
         InputStream defaultIcon = PSXperiaTool.class.getResourceAsStream("/resources/icon.png");
         InputStream wrapperLibrary = PSXperiaTool.class.getResourceAsStream("/resources/libjava-activity-wrapper.so");
         writeStreamToFile(defaultIcon, new File(mOutputDir, "/assets/ZPAK/assets/default/bitmaps/icon.png"));
@@ -200,7 +205,7 @@ public class CrashBandicootExtractor {
     }
 
     private void patchStrings() throws IOException {
-        Logger.info("Patching XML strings with tags.");
+        nextStep("Patching XML strings with tags.");
         if(STRING_REPLACEMENT_MAP.isEmpty()){
             fillReplacementMap();
         }

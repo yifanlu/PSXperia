@@ -69,7 +69,7 @@ public class ZpakCreate {
         while (it.hasNext()) {
             File current = it.next();
             FileInputStream in = new FileInputStream(current);
-            ZipEntry zEntry = new ZipEntry(current.getPath().replaceAll(mDirectory.getPath(), "").substring(1));
+            ZipEntry zEntry = new ZipEntry(current.getPath().replace(mDirectory.getPath(), "").substring(1));
             if (noCompress) {
                 zEntry.setSize(in.getChannel().size());
                 zEntry.setCompressedSize(in.getChannel().size());
@@ -81,6 +81,8 @@ public class ZpakCreate {
             while ((n = in.read(mBuffer)) != -1) {
                 out.write(mBuffer, 0, n);
             }
+            in.close();
+            out.closeEntry();
         }
         out.close();
         Logger.debug("Done with ZPAK creation.");
@@ -90,8 +92,7 @@ public class ZpakCreate {
         CheckedInputStream cis = null;
         long fileSize = 0;
         // Computer CRC32 checksum
-        cis = new CheckedInputStream(
-                new FileInputStream(file), new CRC32());
+        cis = new CheckedInputStream(new FileInputStream(file), new CRC32());
 
         fileSize = file.length();
 
