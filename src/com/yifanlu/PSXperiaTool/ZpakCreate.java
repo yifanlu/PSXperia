@@ -70,7 +70,7 @@ public class ZpakCreate {
         while (it.hasNext()) {
             File current = it.next();
             FileInputStream in = new FileInputStream(current);
-            ZipEntry zEntry = new ZipEntry(current.getPath().replace(mDirectory.getPath(), "").substring(1));
+            ZipEntry zEntry = new ZipEntry(current.getPath().replace(mDirectory.getPath(), "").substring(1).replace("\\","/"));
             if (noCompress) {
                 zEntry.setSize(in.getChannel().size());
                 zEntry.setCompressedSize(in.getChannel().size());
