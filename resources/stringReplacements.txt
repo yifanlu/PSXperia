@@ -19,9 +19,9 @@ parental_control=\"\{PARENTAL_RATING\}\"
 \<description\>.*\</description\>
 \<description\>\{FILTERED_DESCRIPTION\}\</description\>
 \<string name="game_publisher_name"\>.*\</string\>
-\<string name="game_publisher_name"\>\{PUBLISHER\}\</string\>
+\<string name="game_publisher_name"\>\{FILTERED_PUBLISHER\}\</string\>
 \<string name="game_developer_name"\>.*\</string\>
-\<string name="game_developer_name"\>\{DEVELOPER\}\</string\>
+\<string name="game_developer_name"\>\{FILTERED_DEVELOPER\}\</string\>
 \<string name="game_title_id"\>.*\</string\>
 \<string name="game_title_id"\>\{TITLE_ID\}\</string\>
 \<string name="store_type"\>.*\</string\>
@@ -31,6 +31,6 @@ parental_control=\"\{PARENTAL_RATING\}\"
 \<string name="content_url"\>.*\</string\>
 \<string name="content_url"\>file:///sdcard/Android/data/com.sony.playstation.\{TITLE_ID\}/files/content/\{TITLE_ID\}.zpak\</string\>
 \<string name="app_name"\>.*\</string\>
-\<string name="app_name"\>\{DISPLAY_NAME\}\</string\>
+\<string name="app_name"\>\{FILTERED_DISPLAY_NAME\}\</string\>
 \<string name="app_desc"\>.*\</string\>
-\<string name="app_desc"\>\{DESCRIPTION\}\</string\>
+\<string name="app_desc"\>\{FILTERED_DESCRIPTION\}\</string\>

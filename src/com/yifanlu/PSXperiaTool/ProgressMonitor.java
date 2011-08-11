@@ -1,12 +1,23 @@
+/*
+ * PSXperia Converter Tool - Logging
+ * Copyright (C) 2011 Yifan Lu (http://yifan.lu/)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.yifanlu.PSXperiaTool;
 
-/**
- * Created by IntelliJ IDEA.
- * User: yifanlu
- * Date: 8/10/11
- * Time: 4:43 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ProgressMonitor {
     public interface ProgressCallback {
         public void nextStep(String message);
@@ -22,6 +33,17 @@ public class ProgressMonitor {
 
     public void setTotalSteps(int steps){
         this.mTotalSteps = steps;
+    }
+
+    public int getSteps(){
+        return mSteps;
+    }
+    
+    public void jump(int steps){
+        this.mSteps = steps;
+        if(mCallback != null){
+            mCallback.stepsTook(mSteps, mTotalSteps);
+        }
     }
 
     public void nextStep(String message){

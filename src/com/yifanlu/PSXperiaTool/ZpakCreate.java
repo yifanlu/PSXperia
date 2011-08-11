@@ -33,6 +33,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class ZpakCreate {
+
     public static final int BLOCK_SIZE = 1024;
     private OutputStream mOut;
     private File mDirectory;

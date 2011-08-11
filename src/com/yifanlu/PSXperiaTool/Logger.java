@@ -18,7 +18,8 @@
 
 package com.yifanlu.PSXperiaTool;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class Logger {
     public static final int ALL = 0x4;

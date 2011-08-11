@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: com.yifanlu.PSXperiaTool.Interface.CommandLine
+Main-Class: com.yifanlu.PSXperiaTool.Interface.GUI
 

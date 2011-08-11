@@ -9,12 +9,14 @@ Requirements
 
 * Android SDK with "aapk" in your system's PATH variable
 * Java SDK with "jarsigner" in your system's PATH variable
-* Apache Commons IO 2.0.1
+* Apache Commons IO (2.0.1)
+* Swing Layout Extensions (1.0.4)
 * Apktool (http://code.google.com/p/android-apktool/)
 
 To build, just attach these libraries and compile.
 
-To run, use "java -jar PSXperiaTool.jar" to see usage directions, which is also listed below for your convenience.
+To run the GUI, use "java -jar PSXperiaTool.jar"
+To run the command line tool, use "java -cp PSXperiaTool.jar com.yifanlu.PSXperiaTool.Interface.CommandLine" to see usage directions, which is also listed below for your convenience.
 
 Usage:
   Extract and patch data files

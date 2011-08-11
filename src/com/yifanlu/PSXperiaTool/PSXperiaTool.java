@@ -138,6 +138,7 @@ public class PSXperiaTool extends ProgressMonitor {
 
             public void bytesReadChanged(int delta) {
                 mBytesRead += delta;
+                jump(mBytesRead);
                 Logger.verbose("Image bytes read: %d", mBytesRead);
             }
 
@@ -146,12 +147,21 @@ public class PSXperiaTool extends ProgressMonitor {
                 Logger.verbose("Compressed PSImage bytes written: %d", mBytesWritten);
             }
         };
+        // progress management
+        int oldSteps = getSteps();
+        setTotalSteps((int)in.getChannel().size());
+        jump(0);
+
         ps.setCallback(progress);
         ps.compress(out);
         ps.writeTocTable(tocOut);
         out.close();
         tocOut.close();
         in.close();
+
+        setTotalSteps(TOTAL_STEPS);
+        jump(oldSteps);
+
         Logger.debug("Done generating PSImage");
 
         Logger.info("Generating ZPAK.");
@@ -262,7 +272,7 @@ public class PSXperiaTool extends ProgressMonitor {
 
     public static void runCmdWithOutput(String[] cmd) throws IOException, InterruptedException {
         Process ps = Runtime.getRuntime().exec(cmd);
-        BufferedReader in = new BufferedReader(new InputStreamReader(ps.getInputStream()));
+        BufferedReader in = new BufferedReader(new InputStreamReader(ps.getErrorStream()));
         String line;
         while ((line = in.readLine()) != null) {
             Logger.debug(line);
