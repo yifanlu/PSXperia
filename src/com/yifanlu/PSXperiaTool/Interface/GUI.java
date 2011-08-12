@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.InputMismatchException;
 import java.util.Properties;
 
 public class GUI extends javax.swing.JFrame {
@@ -527,7 +528,6 @@ public class GUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-
     private void setFieldsFromProperties(Properties settings) {
         nameInput.setText(settings.getProperty("KEY_DISPLAY_NAME"));
         titleIdInput.setText(settings.getProperty("KEY_TITLE_ID"));
@@ -675,6 +675,7 @@ public class GUI extends javax.swing.JFrame {
                 try {
                     mThis.setEnabled(false);
                     convertButton.setEnabled(false);
+                    CommandLine.verifyTitleID(titleIdInput.getText());
                     setPropertiesFromFields(mSettings);
                     File inputFile = new File(isoInput.getText());
                     File dataDir = new File(dataInput.getText());
@@ -696,6 +697,9 @@ public class GUI extends javax.swing.JFrame {
                     convertProgress.setValue(0);
                     convertButton.setEnabled(true);
                     mThis.setEnabled(true);
+                } catch (InputMismatchException ex) {
+                    Logger.error("Input error: %s", ex.getMessage());
+                    ex.printStackTrace();
                 } catch (InterruptedException ex) {
                     Logger.error("Cannot run build commands, are \"aapk\" and \"jarsigner\" in your system's PATH variable?");
                     ex.printStackTrace();

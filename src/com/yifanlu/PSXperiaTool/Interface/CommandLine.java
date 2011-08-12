@@ -30,8 +30,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.InputMismatchException;
 import java.util.Properties;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
 
 public class CommandLine {
@@ -47,6 +50,13 @@ public class CommandLine {
         }
     }
 
+    public static void verifyTitleID(String toVerify) throws InputMismatchException {
+        Pattern pattern = Pattern.compile("^[A-Za-z0-9_]+$");
+        Matcher matcher = pattern.matcher(toVerify);
+        if (!matcher.find())
+            throw new InputMismatchException("Title ID can only contain alphanumberic characters and underscores.");
+    }
+
     public static void main(String[] args) {
         Logger.setLevel(Logger.DEBUG);
         if (args.length < 1)
@@ -59,6 +69,10 @@ public class CommandLine {
                 doConvertImage(args);
             if (toDo.equals("decompress") || toDo.equals("d"))
                 doDecompressImage(args);
+
+        } catch (InputMismatchException ex) {
+            Logger.error("Input error: %s", ex.getMessage());
+            ex.printStackTrace();
         } catch (InvalidArgumentException ex) {
             Logger.error("Invalid argument: %s", ex.getMessage());
             printHelp();
@@ -165,6 +179,7 @@ public class CommandLine {
             }
         }
 
+        verifyTitleID(titleId);
         PSXperiaTool tool = new PSXperiaTool(settings, inputFile, dataDir, outputDir);
         tool.startBuild();
 
