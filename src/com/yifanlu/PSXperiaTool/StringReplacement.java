@@ -69,6 +69,6 @@ public class StringReplacement {
     }
 
     public static String filter(String value) {
-        return value.replaceAll("\\'", "\\\\\\\\'");
+        return value.replaceAll("\\'", "\\\\\\\\'").replaceAll("\\\"", "\\\\\\\\\"");
     }
 }

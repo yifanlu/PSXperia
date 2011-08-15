@@ -45,6 +45,7 @@ public class PSImageCreate extends PSImage {
         while (mIn.available() != 0) {
             InputStream in = splitPart();
             compressPart(in, out);
+            in.close();
         }
         (new File("temp.dat")).deleteOnExit();
     }

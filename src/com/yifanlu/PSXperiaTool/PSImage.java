@@ -30,7 +30,7 @@ public abstract class PSImage {
     public final static int BLOCK_SIZE = 1024;
     public final static long PART_SIZE = 0x9300;
     public final static int PART_BS = 0x700;
-    protected final static byte[] HEADER = {7, 112, -2, -38, 3, 0, 0, 0, 16, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0};
+    protected final static byte[] HEADER = {0x07, 0x70, (byte)((0xFF)&(0xFE)), (byte)((0xFF)&(0xDA)), 0x03, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     protected InputStream mIn;
     protected byte[] mBuff;
     protected int mBytesWritten;

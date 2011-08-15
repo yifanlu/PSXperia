@@ -701,10 +701,10 @@ public class GUI extends javax.swing.JFrame {
                     Logger.error("Input error: %s", ex.getMessage());
                     ex.printStackTrace();
                 } catch (InterruptedException ex) {
-                    Logger.error("Cannot run build commands, are \"aapk\" and \"jarsigner\" in your system's PATH variable?");
+                    Logger.error("Cannot run build commands, are \"aapk\" and \"jarsigner\" in your system's PATH variable? Java says: %s", ex.getMessage());
                     ex.printStackTrace();
                 } catch (IOException ex) {
-                    Logger.error("Cannot build APK!");
+                    Logger.error("Cannot build APK! Java says: %s", ex.getMessage());
                     ex.printStackTrace();
                 } catch (GeneralSecurityException ex) {
                     Logger.error("Error signing JAR, Java says: %s", ex.getMessage());
@@ -757,7 +757,7 @@ public class GUI extends javax.swing.JFrame {
                     extractButton.setEnabled(true);
                     mThis.setEnabled(true);
                 } catch (IOException ex) {
-                    Logger.error("Cannot extract APK!");
+                    Logger.error("Cannot extract APK! Java says %s", ex.getMessage());
                     ex.printStackTrace();
                 } catch (UnsupportedOperationException ex) {
                     Logger.error("Unsupported exception: %s", ex.getMessage());

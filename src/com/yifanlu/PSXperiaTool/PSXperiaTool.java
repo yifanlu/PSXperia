@@ -26,7 +26,7 @@ import java.security.GeneralSecurityException;
 import java.util.*;
 
 public class PSXperiaTool extends ProgressMonitor {
-    public static final String VERSION = "0.3 Beta 3";
+    public static final String VERSION = "1.0";
     public static final String[] FILES_TO_MODIFY = {
             //"/AndroidManifest.xml",
             "/assets/AndroidManifest.xml",
