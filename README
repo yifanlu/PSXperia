@@ -5,12 +5,14 @@ By Yifan Lu (http://yifan.lu/)
 
 This tool will take a PSX image that you legally own and convert it to be playable on the Xperia Play with the emulator extracted from the packaged game "Crash Bandicoot."
 
-If you just want to use the tool, make sure you have Java installed and download the binaries from GitHub (https://github.com/yifanlu/PSXperia/archives/master).
+If you just want to use the tool, make sure you have Java installed and download the binaries from GitHub (https://github.com/yifanlu/PSXperia/downloads).
 Open "PSXperiaTool.jar" or the helper script ("psxperiatool-gui" or "psxperiatool-gui-windows.bat") if you cannot open .jar files.
 You can also use the helper scripts "psxperiatool" and "psxperiatool-windows.bat" from the command line for command line mode (see below).
 After converting, in the output folder that you selected, you'll find an APK file and a "data" folder. Install the APK on your Xperia Play phone and merge the "data" folder with "Android/data" on the SD card of your phone.
 
-Advanced Instructions
+For detailed directions, check out the [wiki](https://github.com/yifanlu/PSXperia/wiki).
+
+Compiling Instructions
 ========================================
 
 To compile, you need to copy the following to the "lib" directory
