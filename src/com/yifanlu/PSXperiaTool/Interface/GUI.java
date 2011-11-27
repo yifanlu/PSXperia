@@ -23,6 +23,7 @@ import com.yifanlu.PSXperiaTool.Extractor.CrashBandicootExtractor;
 import com.yifanlu.PSXperiaTool.Logger;
 import com.yifanlu.PSXperiaTool.PSXperiaTool;
 import com.yifanlu.PSXperiaTool.ProgressMonitor;
+import org.apache.commons.io.FileUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -30,6 +31,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.util.InputMismatchException;
@@ -557,8 +559,21 @@ public class GUI extends javax.swing.JFrame {
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         try {
             tabbedPane.setEnabled(false);
+
+            // Start logging
             Logger.setGUIFrame(this);
             Logger.setLevel(Logger.DEBUG);
+            try {
+                File log = new File(mCurrentDir, "psxperia.log");
+                if(log.exists())
+                    log.delete();
+                log.createNewFile();
+                PrintStream stream = new PrintStream(log);
+                Logger.setOutput(stream);
+            } catch (IOException ex) {
+                Logger.error("Cannot create log file");
+            }
+
             dataInput.setText((new File(mCurrentDir, "/data")).getPath());
             extractOutputInput.setText((new File(mCurrentDir, "/data")).getPath());
             convertOutputInput.setText((new File(mCurrentDir, "/output")).getPath());
@@ -780,6 +795,7 @@ public class GUI extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
 
@@ -792,7 +808,7 @@ public class GUI extends javax.swing.JFrame {
 
     private JFrame mThis;
     private static final JFileChooser FILE_CHOOSER = new JFileChooser();
-    private final File mCurrentDir = new File(new File(".").getAbsolutePath());
+    private static final File mCurrentDir = new File(new File(".").getAbsolutePath());
     private File mIconImage;
     private Properties mSettings;
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -20,6 +20,8 @@ package com.yifanlu.PSXperiaTool;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 public class Logger {
     public static final int ALL = 0x4;
@@ -33,6 +35,10 @@ public class Logger {
 
     public Logger() {
         this.mLevel = ERROR;
+    }
+
+    public static void setOutput(PrintStream out){
+        System.setOut(out);
     }
 
     public static Logger getInstance() {
