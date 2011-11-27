@@ -239,10 +239,10 @@ public class CommandLine {
         System.out.println("    input-data.zpak   Either NCUA94900_1_1.zpak or NCEA00344_1_1.zpak (must match region of APK)");
         System.out.println("    output            Directory to extract the files");
         System.out.println("");
-        System.out.println("  Convert ISO to Xperia Play APK and ZPAK");
+        System.out.println("  Convert PSX Image to Xperia Play APK and ZPAK");
         System.out.println("  psxperia [c]onvert [OPTIONS] titleId image.iso output");
         System.out.println("    titleId           An unique ID, usually from the game in the format NCXAXXXXX_1");
-        System.out.println("    image.iso         Input PSX image. You must rip it on your own!");
+        System.out.println("    image.iso         Input PSX image. Does not have to be an ISO, and valid PSX image will do. You must rip it on your own!");
         System.out.println("    output            Directory to output files");
         System.out.println("    Options (unset options will be set to defaults):");
         System.out.println("      -v|--verbose    Verbose output, including image creation progress");
@@ -256,11 +256,11 @@ public class CommandLine {
         System.out.println("      --store-type    Where to find this title (any string will do)");
         System.out.println("      --analog-mode   true|false, Turn on/off analog controls (game must support it).");
         System.out.println("");
-        System.out.println("  Convert image.ps to ISO");
+        System.out.println("  Convert image.ps to PSX Image");
         System.out.println("  psxperia [d]ecompress [-v|--verbose] input.ps output.iso");
         System.out.println("    [-v|--verbose]    Verbose output");
         System.out.println("    input.ps          image.ps from ZPAK");
-        System.out.println("    output.iso        ISO file to generate");
+        System.out.println("    output.iso        PSX Image to generate");
         System.exit(0);
     }
 }
