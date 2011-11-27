@@ -38,18 +38,34 @@ public class PSImageExtract extends PSImage {
         Inflater inf = new Inflater();
         int n;
         byte[] buff = new byte[BLOCK_SIZE];
-        while ((n = inf.inflate(buff, 0, BLOCK_SIZE)) != -1) {
-            out.write(buff, 0, n);
-            addBytesWritten(n);
+        try
+        {
+            while ((n = inf.inflate(buff, 0, BLOCK_SIZE)) != -1) {
+                out.write(buff, 0, n);
+                addBytesWritten(n);
+                //System.out.println("Bytes written: " + getBytesWritten());
 
-            if (inf.finished() || inf.needsDictionary()) {
-                int remainder = inf.getRemaining();
-                changeBuffer(remainder);
-                inf.reset();
-                inf.setInput(mBuff, 0, remainder);
-            } else if (inf.needsInput()) {
-                fill(inf);
+                System.out.println(inf.finished());
+                System.out.println(inf.needsDictionary());
+
+                if (inf.finished() || inf.needsDictionary()) {
+                    int remainder = inf.getRemaining();
+                    changeBuffer(remainder);
+                    inf.reset();
+                    inf.setInput(mBuff, 0, remainder);
+                    System.out.println("WE HAVE CHANGED IT!");
+                } else if (inf.needsInput()) {
+                    fill(inf);
+                }
             }
+        }catch(DataFormatException ex){
+            out.write(new byte[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15});
+            out.write(mBuff);
+            byte[] b = new byte[1024];
+            mIn.read(b);
+            out.write(b);
+            out.close();
+            throw ex;
         }
         Logger.debug("Extraction done.");
     }

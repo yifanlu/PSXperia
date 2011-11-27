@@ -22,26 +22,21 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtFile;
-import com.sun.javaws.progress.Progress;
-import com.sun.org.apache.xpath.internal.operations.Or;
 import com.yifanlu.PSXperiaTool.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import ie.wombat.jbdiff.JBPatch;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class CrashBandicootExtractor extends ProgressMonitor {
-    public static long[] KNOWN_VALID_APK_CRC32 = {
-            0xE7BCB6D5l, 0xBB542581l
-    };
-    public static long[] KNOWN_INVALID_APK_CRC32 = {
-            0x3B6A23C1
-    };
     private static final int TOTAL_STEPS = 8;
     private File mApkFile;
     private File mZpakData;
@@ -56,9 +51,10 @@ public class CrashBandicootExtractor extends ProgressMonitor {
         setTotalSteps(TOTAL_STEPS);
     }
 
-    public void extractApk() throws IOException {
+    public void extractApk() throws IOException, URISyntaxException {
         Logger.info("Starting extraction with PSXPeria Extractor version %s", PSXperiaTool.VERSION);
         verifyFiles();
+        processConfig();
         decodeValues();
         FileFilter filterCompiledRes = new FileFilter() {
             public boolean accept(File file) {
@@ -74,6 +70,7 @@ public class CrashBandicootExtractor extends ProgressMonitor {
         cleanUp();
         moveResourceFiles();
         patchStrings();
+        patchEmulator();
         nextStep("Done.");
     }
 
@@ -83,23 +80,43 @@ public class CrashBandicootExtractor extends ProgressMonitor {
             throw new FileNotFoundException("Cannot find APK file: " + mApkFile.getPath());
         if (!mZpakData.exists())
             throw new FileNotFoundException("Cannot find ZPAK file: " + mZpakData.getPath());
-        long crc32 = ZpakCreate.getCRC32(mApkFile);
-        boolean valid = false;
-        for (long check : KNOWN_VALID_APK_CRC32){
-            if (check == crc32)
-                valid = true;
-        }
-        for (long check : KNOWN_INVALID_APK_CRC32){
-            if (check == crc32){
-                throw new UnsupportedOperationException("This version of Crash Bandicoot is known to not work, please use a different version. CRC32: " + crc32);
-            }
-        }
-        if (!valid) {
-            Logger.warning("This APK is not a known valid one. The extractor will continue, but you may get errors later on. CRC32: %d", crc32);
-        }
         if (!mOutputDir.exists())
             mOutputDir.mkdirs();
-        FileUtils.cleanDirectory(mOutputDir);
+        if(mOutputDir.list().length > 0)
+            Logger.warning("The output directory is not empty! Whatever is in this folder will be included in all generated APKs.");
+        //FileUtils.cleanDirectory(mOutputDir);
+    }
+
+    private void processConfig() throws IOException, UnsupportedOperationException {
+        long crc32 = ZpakCreate.getCRC32(mApkFile);
+        String crcString = Long.toHexString(crc32).toUpperCase();
+        InputStream inConfig = null;
+        if((inConfig = PSXperiaTool.class.getResourceAsStream("/resources/patches/" + crcString + "/config.xml")) == null){
+            throw new FileNotFoundException("Cannot find config for this APK (CRC32: " + crcString + ")");
+        }
+        Properties config = new Properties();
+        config.loadFromXML(inConfig);
+        inConfig.close();
+        Logger.info(
+                "Identified " + config.getProperty("game_name", "Unknown Game") +
+                        " " + config.getProperty("game_region") +
+                        " Version " + config.getProperty("game_version", "Unknown") +
+                        ", CRC32: " + config.getProperty("game_crc32", "Unknown")
+        );
+        if(config.getProperty("valid", "yes").equals("no"))
+            throw new UnsupportedOperationException("This APK is not supported.");
+        Logger.verbose("Copying config files.");
+        FileUtils.copyInputStreamToFile(PSXperiaTool.class.getResourceAsStream("/resources/patches/" + crcString + "/config.xml"), new File(mOutputDir, "/config/config.xml"));
+        FileUtils.copyInputStreamToFile(PSXperiaTool.class.getResourceAsStream("/resources/patches/" + crcString + "/filelist.txt"), new File(mOutputDir, "/config/filelist.txt"));
+        FileUtils.copyInputStreamToFile(PSXperiaTool.class.getResourceAsStream("/resources/patches/" + crcString + "/stringReplacements.txt"), new File(mOutputDir, "/config/stringReplacements.txt"));
+        String emulatorPatch = config.getProperty("emulator_patch", "");
+        String gamePatch = config.getProperty("iso_patch", "");
+        if(!gamePatch.equals("")){
+            FileUtils.copyInputStreamToFile(PSXperiaTool.class.getResourceAsStream("/resources/patches/" + crcString + "/" + gamePatch), new File(mOutputDir, "/config/game-patch.bin"));
+        }
+        if(!emulatorPatch.equals("")){
+            FileUtils.copyInputStreamToFile(PSXperiaTool.class.getResourceAsStream("/resources/patches/" + crcString + "/" + emulatorPatch), new File(mOutputDir, "/config/" + emulatorPatch));
+        }
     }
 
     private void extractZip(File zipFile, File output, FileFilter filter) throws IOException {
@@ -201,7 +218,8 @@ public class CrashBandicootExtractor extends ProgressMonitor {
 
     private void fillReplacementMap() throws IOException {
         Logger.verbose("Filling string replacement map with resource data.");
-        InputStream in = PSXperiaTool.class.getResourceAsStream("/resources/stringReplacements.txt");
+        File file = new File(mOutputDir, "/config/stringReplacements.txt");
+        InputStream in = new FileInputStream(file);
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String line1, line2;
         while((line1 = reader.readLine()) != null && (line2 = reader.readLine()) != null){
@@ -212,6 +230,7 @@ public class CrashBandicootExtractor extends ProgressMonitor {
         }
         reader.close();
         in.close();
+        file.delete();
     }
 
     private void patchStrings() throws IOException {
@@ -222,5 +241,26 @@ public class CrashBandicootExtractor extends ProgressMonitor {
         StringReplacement strReplace = new StringReplacement(STRING_REPLACEMENT_MAP, mOutputDir);
         strReplace.execute(PSXperiaTool.FILES_TO_MODIFY);
         Logger.verbose("String replacement done.");
+    }
+
+    private void patchEmulator() throws IOException {
+        Logger.info("Patching emulator.");
+        Properties config = new Properties();
+        config.loadFromXML(new FileInputStream(new File(mOutputDir, "/config/config.xml")));
+        String emulatorPatch = config.getProperty("emulator_patch", "");
+        if(emulatorPatch.equals("")){
+            Logger.info("No patch needed.");
+            return;
+        }
+        File oldFile = new File(mOutputDir, "/lib/armeabi/" + config.getProperty("emulator_name", "libjava-activity.so"));
+        File newFile = new File(mOutputDir, "/lib/armeabi/emulator-patched.bin");
+        File patchFile = new File(mOutputDir, "/config/" + emulatorPatch);
+        if(!oldFile.exists())
+            throw new FileNotFoundException("Cannot find emulator binary!");
+        newFile.createNewFile();
+        JBPatch.bspatch(oldFile, newFile, patchFile);
+        oldFile.delete();
+        FileUtils.moveFile(newFile, oldFile);
+        patchFile.delete();
     }
 }

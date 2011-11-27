@@ -10,7 +10,7 @@ Open "PSXperiaTool.jar" or the helper script ("psxperiatool-gui" or "psxperiatoo
 You can also use the helper scripts "psxperiatool" and "psxperiatool-windows.bat" from the command line for command line mode (see below).
 After converting, in the output folder that you selected, you'll find an APK file and a "data" folder. Install the APK on your Xperia Play phone and merge the "data" folder with "Android/data" on the SD card of your phone.
 
-For detailed directions, check out the [wiki](https://github.com/yifanlu/PSXperia/wiki).
+For detailed directions, check out the wiki: https://github.com/yifanlu/PSXperia/wiki.
 
 Compiling Instructions
 ========================================
@@ -20,6 +20,7 @@ To compile, you need to copy the following to the "lib" directory
 * commons-io-2.0.1.jar from http://commons.apache.org/io/download_io.cgi
 * sdklib.jar from Android SDK (under tools/lib)
 * swing-layout-1.0.4.jar from Netbeans (under platform/modules/ext)
+* jbdiff.jar from http://freecode.com/projects/jbdiff
 
 You also need a copy of "aapt" from Android SDK (under platform-tools)
 * OSX version named aapt-osx

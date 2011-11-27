@@ -30,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.util.InputMismatchException;
 import java.util.Properties;
@@ -761,6 +762,9 @@ public class GUI extends javax.swing.JFrame {
                     ex.printStackTrace();
                 } catch (UnsupportedOperationException ex) {
                     Logger.error("Unsupported exception: %s", ex.getMessage());
+                    ex.printStackTrace();
+                } catch (Exception ex) {
+                    Logger.error("Exception: %s", ex.getMessage());
                     ex.printStackTrace();
                 } finally {
                     extractProgress.setValue(0);

@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.InputMismatchException;
@@ -94,10 +95,13 @@ public class CommandLine {
         } catch (UnsupportedOperationException ex) {
             Logger.error("Unsupported exception: %s", ex.getMessage());
             ex.printStackTrace();
+        } catch (Exception ex) {
+            Logger.error("Exception: %s", ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
-    public static void doExtractData(String[] args) throws InvalidArgumentException, IOException {
+    public static void doExtractData(String[] args) throws InvalidArgumentException, IOException, URISyntaxException {
         if (args.length < 4)
             throw new InvalidArgumentException("Not enough input.");
 

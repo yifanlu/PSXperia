@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>Config File</comment>
+<entry key="game_name">Crash Bandicoot</entry>
+<entry key="game_version">1.0.0</entry>
+<entry key="game_region">EUR</entry>
+<entry key="game_crc32">3B6A23C1</entry>
+<entry key="valid">no</entry>
+</properties>

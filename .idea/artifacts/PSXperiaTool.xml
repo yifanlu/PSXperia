@@ -14,6 +14,7 @@
       </element>
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/swing-layout-1.0.4.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/sdklib.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jbdiff.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

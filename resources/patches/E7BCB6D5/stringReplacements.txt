@@ -1,0 +1,36 @@
+com\.sony\.playstation\.[a-zA-Z0-9_]+
+com\.sony\.playstation\.\{TITLE_ID\}
+android:value\="java\-activity"
+android:value\="java\-activity\-wrapper"
+parental_rating=\".*\"
+parental_rating=\"\{PARENTAL_RATING\}\"
+parental_control=\".*\"
+parental_control=\"\{PARENTAL_RATING\}\"
+\<game_analog_mode\>.*\</game_analog_mode\>
+\<game_analog_mode\>{ANALOG_MODE}\</game_analog_mode\>
+\<publisher\>.*\</publisher\>
+\<publisher\>\{FILTERED_PUBLISHER\}\</publisher\>
+\<developer\>.*\</developer\>
+\<developer\>\{FILTERED_DEVELOPER\}\</developer\>
+\<game_display_name\>.*\</game_display_name\>
+\<game_display_name\>\{FILTERED_DISPLAY_NAME\}\</game_display_name\>
+\<title\>.*\</title\>
+\<title\>\{FILTERED_TITLE\}\</title\>
+\<description\>.*\</description\>
+\<description\>\{FILTERED_DESCRIPTION\}\</description\>
+\<string name="game_publisher_name"\>.*\</string\>
+\<string name="game_publisher_name"\>\{FILTERED_PUBLISHER\}\</string\>
+\<string name="game_developer_name"\>.*\</string\>
+\<string name="game_developer_name"\>\{FILTERED_DEVELOPER\}\</string\>
+\<string name="game_title_id"\>.*\</string\>
+\<string name="game_title_id"\>\{TITLE_ID\}\</string\>
+\<string name="store_type"\>.*\</string\>
+\<string name="store_type"\>\{STORE_TYPE\}\</string\>
+\<string name="contains_manual"\>true\</string\>
+\<string name="contains_manual"\>\{CONTAINS_MANUAL\}\</string\>
+\<string name="content_url"\>.*\</string\>
+\<string name="content_url"\>file:///sdcard/Android/data/com.sony.playstation.\{TITLE_ID\}/files/content/\{TITLE_ID\}.zpak\</string\>
+\<string name="app_name"\>.*\</string\>
+\<string name="app_name"\>\{FILTERED_DISPLAY_NAME\}\</string\>
+\<string name="app_desc"\>.*\</string\>
+\<string name="app_desc"\>\{FILTERED_DESCRIPTION\}\</string\>

@@ -22,11 +22,13 @@ import com.android.sdklib.internal.build.SignedJarBuilder;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
 public class PSXperiaTool extends ProgressMonitor {
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "2.0 Beta";
     public static final String[] FILES_TO_MODIFY = {
             //"/AndroidManifest.xml",
             "/assets/AndroidManifest.xml",
@@ -40,7 +42,7 @@ public class PSXperiaTool extends ProgressMonitor {
     private File mTempDir = null;
     private File mOutputDir;
     private Properties mProperties;
-    private static final int TOTAL_STEPS = 8;
+    private static final int TOTAL_STEPS = 9;
 
     public PSXperiaTool(Properties properties, File inputFile, File dataDir, File outputDir) {
         mInputFile = inputFile;
@@ -58,6 +60,7 @@ public class PSXperiaTool extends ProgressMonitor {
         copyIconImage((File) mProperties.get("IconFile"));
         //BuildResources br = new BuildResources(mProperties, mTempDir);
         replaceStrings();
+        patchGame();
         generateImage();
         generateDefaultZpak();
         //buildResources(br);
@@ -75,6 +78,8 @@ public class PSXperiaTool extends ProgressMonitor {
         if (!tempDir.mkdirs())
             throw new IOException("Cannot create temporary directory!");
         FileUtils.copyDirectory(dataDir, tempDir);
+        Logger.verbose("Deleting config from temp directory.");
+        FileUtils.deleteDirectory(new File(mTempDir, "/config"));
         Logger.debug("Created temporary directory at, %s", tempDir.getPath());
         return tempDir;
     }
@@ -83,7 +88,10 @@ public class PSXperiaTool extends ProgressMonitor {
         nextStep("Checking to make sure all files are there.");
         if(!mDataDir.exists())
             throw new FileNotFoundException("Cannot find data directory!");
-        InputStream fstream = PSXperiaTool.class.getResourceAsStream("/resources/filelist.txt");
+        File filelist = new File(mDataDir, "/config/filelist.txt");
+        if(!filelist.exists())
+            throw new FileNotFoundException("Cannot find list to validate files!");
+        InputStream fstream = new FileInputStream(filelist);
         BufferedReader reader = new BufferedReader(new InputStreamReader(fstream));
         String line;
         while((line = reader.readLine()) != null){
@@ -93,6 +101,14 @@ public class PSXperiaTool extends ProgressMonitor {
             if(!check.exists())
                 throw new IllegalArgumentException("Cannot find required data file: " + line);
         }
+        Properties config = new Properties();
+        config.loadFromXML(new FileInputStream(new File(mDataDir, "/config/config.xml")));
+        Logger.info(
+                "Using data from " + config.getProperty("game_name", "Unknown Game") +
+                        " " + config.getProperty("game_region") +
+                        " Version " + config.getProperty("game_version", "Unknown") +
+                        ", CRC32: " + config.getProperty("game_crc32", "Unknown")
+        );
         Logger.debug("Done checking data.");
     }
 
@@ -128,6 +144,46 @@ public class PSXperiaTool extends ProgressMonitor {
         StringReplacement strReplace = new StringReplacement(replacement, mTempDir);
         strReplace.execute(FILES_TO_MODIFY);
         Logger.debug("Done replacing strings.");
+    }
+
+    private void patchGame() throws IOException {
+        /*
+         * Custom patch format (config/game-patch.bin) is as follows:
+         * 0x8 byte little endian: Address in game image to start patching
+         * 0x8 byte little endian: Length of patch
+         * If there are more patches, repeat after reading the length of patch
+         * Note that all games will be patched the same way, so if a game is broken before patching, it will still be broken!
+         */
+        nextStep("Patching game.");
+        File gamePatch = new File(mDataDir, "/config/game-patch.bin");
+        if(!gamePatch.exists())
+            return;
+        Logger.info("Making a copy of game.");
+        File tempGame = new File(mTempDir, "game.iso");
+        FileUtils.copyFile(mInputFile, tempGame);
+        RandomAccessFile game = new RandomAccessFile(tempGame, "rw");
+        InputStream patch = new FileInputStream(gamePatch);
+        while(true){
+            byte[] rawPatchAddr = new byte[8];
+            byte[] rawPatchLen = new byte[8];
+            if(patch.read(rawPatchAddr) + patch.read(rawPatchLen) < rawPatchAddr.length + rawPatchLen.length)
+                break;
+            ByteBuffer bb = ByteBuffer.wrap(rawPatchAddr);
+            bb.order(ByteOrder.LITTLE_ENDIAN);
+            long patchAddr = bb.getLong();
+            bb = ByteBuffer.wrap(rawPatchLen);
+            bb.order(ByteOrder.LITTLE_ENDIAN);
+            long patchLen = bb.getLong();
+
+            game.seek(patchAddr);
+            while(patchLen --> 0){
+                game.write(patch.read());
+            }
+        }
+        mInputFile = tempGame;
+        game.close();
+        patch.close();
+        Logger.debug("Done patching game.");
     }
 
     private void generateImage() throws IOException {
@@ -166,6 +222,8 @@ public class PSXperiaTool extends ProgressMonitor {
         jump(oldSteps);
 
         Logger.debug("Done generating PSImage");
+        Logger.debug("Deleting temporary patched game.");
+        FileUtils.deleteQuietly(new File(mTempDir, "game.iso"));
 
         Logger.info("Generating ZPAK.");
         File zpakDirectory = new File(mTempDir, "/ZPAK");
