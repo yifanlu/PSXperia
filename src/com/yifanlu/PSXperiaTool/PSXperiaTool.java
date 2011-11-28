@@ -78,8 +78,6 @@ public class PSXperiaTool extends ProgressMonitor {
         if (!tempDir.mkdirs())
             throw new IOException("Cannot create temporary directory!");
         FileUtils.copyDirectory(dataDir, tempDir);
-        Logger.verbose("Deleting config from temp directory.");
-        FileUtils.deleteDirectory(new File(mTempDir, "/config"));
         Logger.debug("Created temporary directory at, %s", tempDir.getPath());
         return tempDir;
     }
@@ -155,7 +153,7 @@ public class PSXperiaTool extends ProgressMonitor {
          * Note that all games will be patched the same way, so if a game is broken before patching, it will still be broken!
          */
         nextStep("Patching game.");
-        File gamePatch = new File(mDataDir, "/config/game-patch.bin");
+        File gamePatch = new File(mTempDir, "/config/game-patch.bin");
         if(!gamePatch.exists())
             return;
         Logger.info("Making a copy of game.");
@@ -259,6 +257,8 @@ public class PSXperiaTool extends ProgressMonitor {
         FileUtils.cleanDirectory(outDataDir);
         FileUtils.moveFileToDirectory(new File(mTempDir, "/" + titleId + ".zpak"), outDataDir, false);
         FileUtils.moveFileToDirectory(new File(mTempDir, "/image_ps_toc.bin"), outDataDir, false);
+        Logger.verbose("Deleting config from temp directory.");
+        FileUtils.deleteDirectory(new File(mTempDir, "/config"));
         File outApk = new File(mOutputDir, "/com.sony.playstation." + titleId + ".apk");
 
         ApkBuilder build = new ApkBuilder(mTempDir, outApk);

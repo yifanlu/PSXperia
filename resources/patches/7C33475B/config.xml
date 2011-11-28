@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>Config File</comment>
+<entry key="game_name">Crash Bandicoot</entry>
+<entry key="game_version">1.0.3</entry>
+<entry key="game_region">EUR</entry>
+<entry key="game_crc32">7C33475B</entry>
+<entry key="emulator_name">libjava-activity.so</entry>
+<entry key="emulator_crc32">ADB184B5</entry>
+<entry key="emulator_patch">libjava-activity.so.jbpatch</entry>
+<entry key="iso_patch">game-patch.bin</entry>
+</properties>

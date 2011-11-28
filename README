@@ -41,10 +41,10 @@ Usage:
     input-data.zpak   Either NCUA94900_1_1.zpak or NCEA00344_1_1.zpak (must match region of APK)
     output            Directory to extract the files
 
-  Convert ISO to Xperia Play APK and ZPAK
+  Convert PSX Image to Xperia Play APK and ZPAK
   psxperia [c]onvert [OPTIONS] titleId image.iso output
     titleId           An unique ID, usually from the game in the format NCXAXXXXX_1
-    image.iso         Input PSX image. You must rip it on your own!
+    image.iso         Input PSX image. Does not have to be an ISO, and valid PSX image will do. You must rip it on your own!
     output            Directory to output files
     Options (unset options will be set to defaults):
       -v|--verbose    Verbose output, including image creation progress
@@ -58,7 +58,7 @@ Usage:
       --store-type    Where to find this title (any string will do)
       --analog-mode   true|false, Turn on/off analog controls (game must support it).
 
-  Convert image.ps to ISO
+  Convert image.ps to PSX Image
   psxperia [d]ecompress [-v|--verbose] input.ps output.iso
     [-v|--verbose]    Verbose output
     input.ps          image.ps from ZPAK

@@ -43,17 +43,12 @@ public class PSImageExtract extends PSImage {
             while ((n = inf.inflate(buff, 0, BLOCK_SIZE)) != -1) {
                 out.write(buff, 0, n);
                 addBytesWritten(n);
-                //System.out.println("Bytes written: " + getBytesWritten());
-
-                System.out.println(inf.finished());
-                System.out.println(inf.needsDictionary());
 
                 if (inf.finished() || inf.needsDictionary()) {
                     int remainder = inf.getRemaining();
                     changeBuffer(remainder);
                     inf.reset();
                     inf.setInput(mBuff, 0, remainder);
-                    System.out.println("WE HAVE CHANGED IT!");
                 } else if (inf.needsInput()) {
                     fill(inf);
                 }
