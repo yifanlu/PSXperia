@@ -1,7 +1,5 @@
 com\.sony\.playstation\.[a-zA-Z0-9_]+
 com\.sony\.playstation\.\{TITLE_ID\}
-android:value\="java\-activity"
-android:value\="java\-activity\-wrapper"
 parental_rating=\".*\"
 parental_rating=\"\{PARENTAL_RATING\}\"
 parental_control=\".*\"
@@ -26,6 +24,8 @@ parental_control=\"\{PARENTAL_RATING\}\"
 \<string name="game_title_id"\>\{TITLE_ID\}\</string\>
 \<string name="store_type"\>.*\</string\>
 \<string name="store_type"\>\{STORE_TYPE\}\</string\>
+\<string name="parental_rating"\>.*\</string\>
+\<string name="parental_rating"\>\{PARENTAL_RATING\}\</string\>
 \<string name="contains_manual"\>true\</string\>
 \<string name="contains_manual"\>\{CONTAINS_MANUAL\}\</string\>
 \<string name="content_url"\>.*\</string\>

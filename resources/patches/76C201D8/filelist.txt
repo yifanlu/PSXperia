@@ -61,7 +61,7 @@
 /assets/ZPAK/data/params.bin
 /assets/ZPAK/metadata.xml
 /classes.dex
-/lib/armeabi/libjava-activity-wrapper.so
+/lib/armeabi/libjava-activity-patched.so
 /lib/armeabi/libjava-activity.so
 /lib/armeabi/libzplatform.so
 /res/drawable/controller_icon.png

@@ -7,6 +7,7 @@
 <entry key="game_region">EUR</entry>
 <entry key="game_crc32">BB542581</entry>
 <entry key="emulator_name">libjava-activity.so</entry>
+<entry key="emulator_crc32">A4D2788D</entry>
 <entry key="emulator_patch"></entry>
 <entry key="iso_patch"></entry>
 </properties>

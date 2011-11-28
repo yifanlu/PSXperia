@@ -195,13 +195,10 @@ public class CrashBandicootExtractor extends ProgressMonitor {
     private void moveResourceFiles() throws IOException {
         nextStep("Adding new files.");
         InputStream defaultIcon = PSXperiaTool.class.getResourceAsStream("/resources/icon.png");
-        InputStream wrapperLibrary = PSXperiaTool.class.getResourceAsStream("/resources/libjava-activity-wrapper.so");
         writeStreamToFile(defaultIcon, new File(mOutputDir, "/assets/ZPAK/assets/default/bitmaps/icon.png"));
         defaultIcon = PSXperiaTool.class.getResourceAsStream("/resources/icon.png");
         writeStreamToFile(defaultIcon, new File(mOutputDir, "/res/drawable/icon.png"));
-        writeStreamToFile(wrapperLibrary, new File(mOutputDir, "/lib/armeabi/libjava-activity-wrapper.so"));
         defaultIcon.close();
-        wrapperLibrary.close();
         Logger.verbose("Done adding new files.");
     }
 
@@ -244,23 +241,25 @@ public class CrashBandicootExtractor extends ProgressMonitor {
     }
 
     private void patchEmulator() throws IOException {
-        Logger.info("Patching emulator.");
+        Logger.info("Verifying the emulator binary.");
         Properties config = new Properties();
         config.loadFromXML(new FileInputStream(new File(mOutputDir, "/config/config.xml")));
-        String emulatorPatch = config.getProperty("emulator_patch", "");
+        String emulatorName = config.getProperty("emulator_name", "libjava-activity.so");
+        File origEmulator = new File(mOutputDir, "/lib/armeabi/" + emulatorName);
+        String emulatorCRC32 = Long.toHexString(FileUtils.checksumCRC32(origEmulator));
+        if(!emulatorCRC32.equalsIgnoreCase(config.getProperty("emulator_crc32")))
+            throw new UnsupportedOperationException("The emulator checksum is invalid. Cannot patch. CRC32: " + emulatorCRC32);
+        File newEmulator = new File(mOutputDir, "/lib/armeabi/libjava-activity-patched.so");
+        File emulatorPatch = new File(mOutputDir, "/config/" + config.getProperty("emulator_patch", ""));
         if(emulatorPatch.equals("")){
             Logger.info("No patch needed.");
-            return;
+            FileUtils.moveFile(origEmulator, newEmulator);
+        }else{
+            Logger.info("Patching emulator.");
+            newEmulator.createNewFile();
+            JBPatch.bspatch(origEmulator, newEmulator, emulatorPatch);
+            emulatorPatch.delete();
         }
-        File oldFile = new File(mOutputDir, "/lib/armeabi/" + config.getProperty("emulator_name", "libjava-activity.so"));
-        File newFile = new File(mOutputDir, "/lib/armeabi/emulator-patched.bin");
-        File patchFile = new File(mOutputDir, "/config/" + emulatorPatch);
-        if(!oldFile.exists())
-            throw new FileNotFoundException("Cannot find emulator binary!");
-        newFile.createNewFile();
-        JBPatch.bspatch(oldFile, newFile, patchFile);
-        oldFile.delete();
-        FileUtils.moveFile(newFile, oldFile);
-        patchFile.delete();
+        FileUtils.copyInputStreamToFile(PSXperiaTool.class.getResourceAsStream("/resources/libjava-activity-wrapper.so"), origEmulator);
     }
 }
